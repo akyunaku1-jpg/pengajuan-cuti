@@ -1,0 +1,16 @@
+{
+  "name": "employee-leave-vercel-api",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev:client": "npm --prefix client run dev",
+    "build:client": "npm --prefix client run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.56.1",
+    "bcrypt": "^6.0.0",
+    "formidable": "^3.5.4",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
