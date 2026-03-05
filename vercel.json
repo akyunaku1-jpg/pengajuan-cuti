@@ -1,12 +1,6 @@
 {
-  "framework": "vite",
-  "installCommand": "cd client && yarn install",
-  "buildCommand": "cd client && yarn build",
+  "installCommand": "cd client && npm install",
+  "buildCommand": "cd client && npm run build",
   "outputDirectory": "client/dist",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
+  "framework": null
 }
