@@ -1,0 +1,12 @@
+{
+  "framework": "vite",
+  "installCommand": "yarn install",
+  "buildCommand": "cd client && yarn build",
+  "outputDirectory": "client/dist",
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
