@@ -3,6 +3,7 @@ import { ClipboardList, Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useAuth } from "../context/AuthContext";
+import api from "../lib/api";
 
 const LoginPage = () => {
   const { login } = useAuth();
@@ -11,6 +12,15 @@ const LoginPage = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetStep, setResetStep] = useState("email");
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetForm, setResetForm] = useState({
+    email: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [resetErrors, setResetErrors] = useState({});
 
   const validate = () => {
     const next = {};
@@ -32,6 +42,71 @@ const LoginPage = () => {
       toast.error(error.response?.data?.message || "Email atau kata sandi tidak valid.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const closeResetModal = () => {
+    setShowResetModal(false);
+    setResetStep("email");
+    setResetLoading(false);
+    setResetErrors({});
+    setResetForm({ email: "", newPassword: "", confirmPassword: "" });
+  };
+
+  const submitResetEmail = async (e) => {
+    e.preventDefault();
+    const next = {};
+    if (!resetForm.email.trim()) next.email = "Kolom ini wajib diisi";
+    setResetErrors(next);
+    if (Object.keys(next).length > 0) return;
+
+    setResetLoading(true);
+    try {
+      await api.post("/auth/reset-password", {
+        email: resetForm.email,
+        verifyOnly: true,
+      });
+      setResetStep("password");
+      setResetErrors({});
+    } catch (error) {
+      const message = error.response?.data?.message || "Gagal memverifikasi email.";
+      setResetErrors({ email: message });
+    } finally {
+      setResetLoading(false);
+    }
+  };
+
+  const submitResetPassword = async (e) => {
+    e.preventDefault();
+    const next = {};
+    const email = resetForm.email.trim().toLowerCase();
+    const newPassword = resetForm.newPassword;
+    const confirmPassword = resetForm.confirmPassword;
+
+    if (!newPassword) next.newPassword = "Kolom ini wajib diisi";
+    if (newPassword && newPassword.length < 8) next.newPassword = "Minimal 8 karakter";
+    if (!confirmPassword) next.confirmPassword = "Kolom ini wajib diisi";
+    if (newPassword && confirmPassword && newPassword !== confirmPassword) {
+      next.confirmPassword = "Konfirmasi kata sandi tidak sama";
+    }
+    setResetErrors(next);
+    if (Object.keys(next).length > 0) return;
+
+    setResetLoading(true);
+    try {
+      await api.post("/auth/reset-password", { email, newPassword });
+      toast.success("Kata sandi berhasil direset. Silakan login.");
+      closeResetModal();
+    } catch (error) {
+      const message = error.response?.data?.message || "Gagal mereset kata sandi.";
+      if (message.toLowerCase().includes("email")) {
+        setResetStep("email");
+        setResetErrors({ email: message });
+      } else {
+        setResetErrors({ newPassword: message });
+      }
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -92,11 +167,103 @@ const LoginPage = () => {
         </form>
 
         <div className="mt-[18px] text-center">
-          <Link className="text-[13px] text-[#6C8CF5] hover:underline" to="#">
+          <Link
+            className="text-[13px] text-[#6C8CF5] hover:underline"
+            to="#"
+            onClick={(e) => {
+              e.preventDefault();
+              setShowResetModal(true);
+            }}
+          >
             Lupa Kata Sandi?
           </Link>
         </div>
       </div>
+
+      {showResetModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+            <h2 className="text-lg font-bold text-slate-800">Reset Kata Sandi</h2>
+            {resetStep === "email" ? (
+              <form className="mt-4 space-y-4" onSubmit={submitResetEmail}>
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-slate-700">Email</label>
+                  <input
+                    type="email"
+                    value={resetForm.email}
+                    onChange={(e) => setResetForm((prev) => ({ ...prev, email: e.target.value }))}
+                    className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-3 text-sm text-[#0F172A] focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+                    placeholder="admin@company.com"
+                  />
+                  {resetErrors.email && <p className="mt-1 text-xs text-rejected">{resetErrors.email}</p>}
+                </div>
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeResetModal}
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetLoading}
+                    className="rounded-lg bg-[#6C8CF5] px-3 py-2 text-sm font-semibold text-white hover:bg-[#5A78E3] disabled:opacity-70"
+                  >
+                    {resetLoading ? "Memproses..." : "Lanjut"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form className="mt-4 space-y-4" onSubmit={submitResetPassword}>
+                <p className="text-sm text-slate-600">
+                  Email terverifikasi: <span className="font-semibold text-slate-800">{resetForm.email}</span>
+                </p>
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-slate-700">Kata Sandi Baru</label>
+                  <input
+                    type="password"
+                    value={resetForm.newPassword}
+                    onChange={(e) => setResetForm((prev) => ({ ...prev, newPassword: e.target.value }))}
+                    className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-3 text-sm text-[#0F172A] focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+                    placeholder="Minimal 8 karakter"
+                  />
+                  {resetErrors.newPassword && <p className="mt-1 text-xs text-rejected">{resetErrors.newPassword}</p>}
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-sm font-semibold text-slate-700">Konfirmasi Kata Sandi</label>
+                  <input
+                    type="password"
+                    value={resetForm.confirmPassword}
+                    onChange={(e) => setResetForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+                    className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-3 text-sm text-[#0F172A] focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+                    placeholder="Ulangi kata sandi baru"
+                  />
+                  {resetErrors.confirmPassword && (
+                    <p className="mt-1 text-xs text-rejected">{resetErrors.confirmPassword}</p>
+                  )}
+                </div>
+                <div className="flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={closeResetModal}
+                    className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={resetLoading}
+                    className="rounded-lg bg-[#6C8CF5] px-3 py-2 text-sm font-semibold text-white hover:bg-[#5A78E3] disabled:opacity-70"
+                  >
+                    {resetLoading ? "Memproses..." : "Simpan Kata Sandi"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

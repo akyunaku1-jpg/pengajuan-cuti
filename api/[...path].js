@@ -179,6 +179,52 @@ const handleLogin = async (req, res) => {
   sendJson(res, 200, { token: signToken(user), user: sanitizeUser(user) });
 };
 
+const handleResetPassword = async (req, res) => {
+  const body = await parseJsonBody(req);
+  const email = String(body.email || "").toLowerCase().trim();
+  const verifyOnly = Boolean(body.verifyOnly);
+  const newPassword = String(body.newPassword || "");
+
+  if (!email) {
+    sendJson(res, 400, { message: "Email wajib diisi." });
+    return;
+  }
+
+  const { data: user, error: userError } = await supabase
+    .from("users")
+    .select("id")
+    .eq("email", email)
+    .maybeSingle();
+  if (userError) throw userError;
+  if (!user) {
+    sendJson(res, 404, { message: "Email tidak terdaftar." });
+    return;
+  }
+
+  if (verifyOnly) {
+    sendJson(res, 200, { message: "Email terdaftar." });
+    return;
+  }
+
+  if (!newPassword) {
+    sendJson(res, 400, { message: "Kata sandi baru wajib diisi." });
+    return;
+  }
+  if (newPassword.length < 8) {
+    sendJson(res, 400, { message: "Kata sandi baru minimal 8 karakter." });
+    return;
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const { error: updateError } = await supabase
+    .from("users")
+    .update({ password: hashedPassword })
+    .eq("id", user.id);
+  if (updateError) throw updateError;
+
+  sendJson(res, 200, { message: "Kata sandi berhasil diperbarui." });
+};
+
 const handleMe = async (req, res, authUser) => {
   const user = await findUserById(authUser.id);
   if (!user) {
@@ -455,6 +501,10 @@ export default async function handler(req, res) {
 
     if (req.method === "POST" && parts[0] === "auth" && parts[1] === "login" && parts.length === 2) {
       await handleLogin(req, res);
+      return;
+    }
+    if (req.method === "POST" && parts[0] === "auth" && parts[1] === "reset-password" && parts.length === 2) {
+      await handleResetPassword(req, res);
       return;
     }
 
