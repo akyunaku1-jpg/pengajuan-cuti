@@ -97,9 +97,16 @@ const RequestHistoryPage = () => {
                 <tr key={item.id} className="table-row fade-up">
                   <td className="px-4 py-3">{formatDate(item.created_at)}</td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getLeaveTypeTagClass(item.leave_type)}`}>
-                      {getLeaveTypeLabel(item.leave_type)}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getLeaveTypeTagClass(item.leave_type)}`}>
+                        {getLeaveTypeLabel(item.leave_type)}
+                      </span>
+                      {item.warning ? (
+                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                          {item.warning}
+                        </span>
+                      ) : null}
+                    </div>
                   </td>
                   <td className="px-4 py-3">{formatDate(item.start_date)}</td>
                   <td className="px-4 py-3">{formatDate(item.end_date)}</td>

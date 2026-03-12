@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Check } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "../../lib/api";
 
@@ -61,80 +62,89 @@ const TambahAkunPage = () => {
   };
 
   return (
-    <section className="space-y-4">
-      <h1 className="font-heading text-2xl font-bold">Tambah Akun</h1>
-      <form className="fade-up mx-auto max-w-[600px] space-y-4 app-card p-6" onSubmit={submit}>
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Nama Lengkap</label>
-          <input
-            className="app-input"
-            value={form.name}
-            onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
-          />
-          {errors.name && <p className="mt-1 text-xs text-rejected">{errors.name}</p>}
-        </div>
+    <section className="mx-auto max-w-[860px]">
+      <form
+        className="mx-auto max-w-[640px] rounded-2xl bg-white p-8 shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_16px_rgba(0,0,0,0.04)]"
+        onSubmit={submit}
+      >
+        <h1 className="text-[17px] font-bold text-[#0F172A] [font-family:Outfit,Plus_Jakarta_Sans,sans-serif]">Tambah Akun</h1>
+        <p className="mt-1 text-[13px] text-slate-500">Buat akun baru untuk admin atau karyawan</p>
+        <div className="my-5 border-b border-slate-200" />
 
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Email</label>
-          <input
-            type="email"
-            className="app-input"
-            value={form.email}
-            onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
-          />
-          {errors.email && <p className="mt-1 text-xs text-rejected">{errors.email}</p>}
-        </div>
+        <div className="space-y-5">
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Nama Lengkap</label>
+            <input
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.name}
+              onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
+            />
+            {errors.name && <p className="mt-1 text-xs text-rejected">{errors.name}</p>}
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Password</label>
-          <input
-            type="password"
-            className="app-input"
-            value={form.password}
-            onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
-          />
-          {errors.password && <p className="mt-1 text-xs text-rejected">{errors.password}</p>}
-        </div>
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Email</label>
+            <input
+              type="email"
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.email}
+              onChange={(e) => setForm((prev) => ({ ...prev, email: e.target.value }))}
+            />
+            {errors.email && <p className="mt-1 text-xs text-rejected">{errors.email}</p>}
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Konfirmasi Password</label>
-          <input
-            type="password"
-            className="app-input"
-            value={form.confirmPassword}
-            onChange={(e) => setForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-          />
-          {errors.confirmPassword && <p className="mt-1 text-xs text-rejected">{errors.confirmPassword}</p>}
-        </div>
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Password</label>
+            <input
+              type="password"
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.password}
+              onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
+            />
+            {errors.password && <p className="mt-1 text-xs text-rejected">{errors.password}</p>}
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Divisi</label>
-          <input
-            className="app-input"
-            value={form.division}
-            onChange={(e) => setForm((prev) => ({ ...prev, division: e.target.value }))}
-          />
-          {errors.division && <p className="mt-1 text-xs text-rejected">{errors.division}</p>}
-        </div>
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Konfirmasi Password</label>
+            <input
+              type="password"
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.confirmPassword}
+              onChange={(e) => setForm((prev) => ({ ...prev, confirmPassword: e.target.value }))}
+            />
+            {errors.confirmPassword && <p className="mt-1 text-xs text-rejected">{errors.confirmPassword}</p>}
+          </div>
 
-        <div>
-          <label className="mb-1 block text-sm font-semibold">Jabatan</label>
-          <select
-            className="app-input"
-            value={form.role}
-            onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
-          >
-            <option value="employee">Karyawan</option>
-            <option value="admin">Admin</option>
-          </select>
-          {errors.role && <p className="mt-1 text-xs text-rejected">{errors.role}</p>}
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Divisi</label>
+            <input
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.division}
+              onChange={(e) => setForm((prev) => ({ ...prev, division: e.target.value }))}
+            />
+            {errors.division && <p className="mt-1 text-xs text-rejected">{errors.division}</p>}
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-[13px] font-semibold text-[#374151]">Jabatan</label>
+            <select
+              className="w-full rounded-[10px] border-[1.5px] border-[#E2E8F0] bg-[#F8FAFF] px-[14px] py-[11px] text-sm text-[#0F172A] transition duration-200 focus:border-[#6C8CF5] focus:bg-white focus:outline-none focus:ring-4 focus:ring-[#6c8cf51f]"
+              value={form.role}
+              onChange={(e) => setForm((prev) => ({ ...prev, role: e.target.value }))}
+            >
+              <option value="employee">Karyawan</option>
+              <option value="admin">Admin</option>
+            </select>
+            {errors.role && <p className="mt-1 text-xs text-rejected">{errors.role}</p>}
+          </div>
         </div>
 
         <button
           type="submit"
           disabled={loading}
-          className="app-button-primary font-heading w-full font-bold shadow-[0_10px_24px_rgba(108,140,245,0.28)] hover:shadow-primary-lift disabled:opacity-70"
+          className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-[10px] bg-gradient-to-br from-[#6C8CF5] to-[#5A78E3] px-4 py-3 text-[15px] font-bold text-white shadow-[0_4px_16px_rgba(108,140,245,0.35)] transition duration-200 hover:-translate-y-[1px] hover:from-[#5A78E3] hover:to-[#4A68D3] disabled:opacity-70 [font-family:Outfit,Plus_Jakarta_Sans,sans-serif]"
         >
+          <Check size={16} />
           {loading ? "Memproses..." : "Buat Akun"}
         </button>
       </form>

@@ -52,11 +52,17 @@ const RequestFormPage = () => {
       payload.append("end_date", form.end_date);
       payload.append("reason", form.reason.trim());
       if (form.file) payload.append("file", form.file);
-      await api.post("/requests", payload);
+      const response = await api.post("/requests", payload);
+      const backendWarning = response.data?.warning;
       toast.success("Pengajuan berhasil dikirim! Status: Pending");
+      if (backendWarning) {
+        toast(backendWarning, { icon: "⚠️" });
+      }
       navigate("/history");
     } catch (error) {
-      toast.error(error.response?.data?.message || "Gagal mengirim pengajuan.");
+      const serverMessage = error.response?.data?.message;
+      const serverDetail = error.response?.data?.detail;
+      toast.error(serverDetail ? `${serverMessage} (${serverDetail})` : serverMessage || "Gagal mengirim pengajuan.");
     } finally {
       setLoading(false);
     }

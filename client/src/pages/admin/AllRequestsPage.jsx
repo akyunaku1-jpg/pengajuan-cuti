@@ -36,6 +36,12 @@ const AllRequestsPage = () => {
     load();
   }, []);
 
+  useEffect(() => {
+    if (selectedRequest) {
+      console.log("[AllRequestsPage] selectedRequest", selectedRequest);
+    }
+  }, [selectedRequest]);
+
   const filtered = useMemo(() => {
     if (activeFilter === "all") return requests;
     return requests.filter((item) => item.status === activeFilter);
@@ -68,6 +74,11 @@ const AllRequestsPage = () => {
     } finally {
       setLoadingReject(false);
     }
+  };
+
+  const getSupportingDocumentUrl = (value) => {
+    if (typeof value !== "string") return "";
+    return value.trim();
   };
 
   return (
@@ -151,9 +162,16 @@ const AllRequestsPage = () => {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getLeaveTypeTagClass(item.leave_type)}`}>
-                      {getLeaveTypeLabel(item.leave_type)}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${getLeaveTypeTagClass(item.leave_type)}`}>
+                        {getLeaveTypeLabel(item.leave_type)}
+                      </span>
+                      {item.warning ? (
+                        <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-semibold text-amber-700">
+                          {item.warning}
+                        </span>
+                      ) : null}
+                    </div>
                   </td>
                   <td className="px-4 py-3">{formatDate(item.start_date)}</td>
                   <td className="px-4 py-3">{formatDate(item.end_date)}</td>
@@ -269,6 +287,25 @@ const AllRequestsPage = () => {
               <div className="pt-2">
                 <p className="mb-1 text-slate-500">Alasan</p>
                 <p className="rounded-xl bg-slate-50 p-3 text-slate-700">{selectedRequest.reason || "-"}</p>
+              </div>
+              <div>
+                <p className="mb-1 text-slate-500">Dokumen Pendukung</p>
+                {(() => {
+                  const supportingDocumentUrl = getSupportingDocumentUrl(selectedRequest.file_url);
+                  if (!supportingDocumentUrl) {
+                    return <p className="rounded-xl bg-slate-50 p-3 text-slate-700">-</p>;
+                  }
+                  return (
+                  <a
+                    href={supportingDocumentUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center justify-center rounded-xl border border-[#c7d2fe] bg-[#eef2ff] px-3 py-2 text-sm font-semibold text-[#4f46e5] transition hover:bg-[#dbeafe]"
+                  >
+                    Lihat / Unduh Dokumen
+                  </a>
+                  );
+                })()}
               </div>
               <div>
                 <p className="mb-1 text-slate-500">Catatan Admin</p>
